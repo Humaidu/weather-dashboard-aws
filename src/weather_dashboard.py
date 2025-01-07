@@ -2,6 +2,8 @@ import os
 import json
 import boto3
 import requests
+import random
+import string
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -10,9 +12,12 @@ load_dotenv()
 
 class WeatherDashboard:
     def __init__(self):
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+        self.bucket_name = f"weather-dashboard-{random_suffix}"
         self.api_key = os.getenv('OPENWEATHER_API_KEY')
-        self.bucket_name = os.getenv('AWS_BUCKET_NAME')
-        self.s3_client = boto3.client('s3')
+        self.s3_client = boto3.client('s3', aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+                                      region_name=os.getenv('AWS_DEFAULT_REGION'))
 
     def create_bucket_if_not_exists(self):
         """Create S3 bucket if it doesn't exist"""
